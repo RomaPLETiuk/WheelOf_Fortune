@@ -4,7 +4,13 @@
      <meta charset="UTF-8">
      <title>Реверс слова 345</title>
      <link href="css/style.css" rel="stylesheet" type="text/css">
-     <script src="js/rev.js" type="text/javascript"></script>
+     
+     <link
+     rel="icon"
+      sizes="180x180"
+      href="./img/apple-touch-icon.png"
+    />
+    
  </head>
  <body>
     <h2 id='text1'>
@@ -20,4 +26,14 @@
 </div>
     
  </body>
+ <script >
+ function run(){
+    var userText=document.querySelector('#userText').value;
+    var ul=document.querySelector('ul');
+    var li=document.createElement('li');
+    li.innerText=userText.split("").reverse().join("");
+        ul.appendChild(li);
+//return alert(userText.split("").reverse().join(""));
+}
+</script>
  </html>
