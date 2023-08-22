@@ -1,4 +1,4 @@
-<--<!DOCTYPE html>
+<!--<!DOCTYPE html>
  <html >
  <head>
      <meta charset="UTF-8">
@@ -36,4 +36,360 @@
 //return alert(userText.split("").reverse().join(""));
 }
 </script>
- </html>!-->
+ </html>-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body{
+                width: 45%;
+                background-color: #787878;
+                margin: 0 auto;
+            }
+
+            #wheelOfFortune {
+                display: inline-flex;
+                position: relative;
+                overflow: hidden;
+                margin-top: 4%;  
+            }
+
+            #wheel {
+                display: block;
+                max-width: 100%;
+            }
+
+            #spin {
+                font: 1.5rem/0 sans-serif;
+                user-select: none;
+                cursor: pointer;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 30%;
+                height: 30%;
+                margin: -15%;
+                background: #fff;
+                color: #fff;
+                box-shadow: 0 0 0 8px currentColor, 0 0px 15px 5px rgba(0, 0, 0, 0.6);
+                border-radius: 50%;
+                transition: 0.8s;
+            }
+
+            #spin::after {
+                content: "";
+                position: absolute;
+                top: -17px;
+                border: 10px solid transparent;
+                border-bottom-color: currentColor;
+                border-top: none;
+            }
+            #latestPrize{
+                color: aliceblue;
+                font-weight: bold;
+                font-size: 25px;
+            }
+            #prizeMenu{
+                width: 230px;
+                border-radius: 25px;
+                background-color: #565656;
+                float: right;
+            }
+            h3{
+                color:aliceblue;
+                text-decoration: underline;
+                text-transform: uppercase;
+                font-size: 25px;
+                text-align: center;
+            }
+            li{
+            list-style-type: none;  
+            }
+            span{
+                font-size: 20px;
+                list-style-type: none;
+                display: inline-block;
+                background-color: #d9d9d9;
+                height: min-content;
+                width: 70%;
+                text-align: center;
+                border-radius: 15px;
+                font-weight: bold;
+                margin: 4px;
+
+            }
+            .removePrize{
+                margin-left: 10px;
+                font-size: 28px;
+                color: rgb(180, 36, 65);
+                font-weight: bolder;
+                text-decoration: none;
+                top: 3px;
+                position: relative;
+            }
+            .removePrize:hover {
+                cursor: pointer;
+                color: rgb(253, 0, 51);
+            }
+            .add-prize{
+                bottom: 0;
+                position: relative;
+                display: grid;
+                margin: 80px 15px 10px 15px;
+            }
+            input {
+                background-color: transparent;
+                border: none;
+                outline: none;
+                color: aliceblue;
+                border-bottom: 3px solid aliceblue;
+                height: 25px;
+                text-align: center;
+            }
+            #add-prize{
+                border-radius: 15px;
+                height: min-content;
+                text-transform: uppercase;
+                font-weight: bold;
+                font-size: 15px;
+                background-color: #d9d9d9;
+                margin: 10px 0;
+            }
+
+            @media screen and (max-width: 1775px){
+                body{
+                    width: 70%;
+                }
+            }
+            @media screen and (max-width: 975px){
+                #wheelOfFortune{
+                    left: 20%;
+                }
+            }
+            @media screen and (max-width: 975px){
+                body{
+                    width: 90%;
+                }
+                #prizeMenu{
+                    float: none;
+                    margin: 0 auto;
+                }
+            }
+            @media screen and (max-width: 600px){
+                #wheelOfFortune{
+                    left: 0;
+                }
+            }  
+        </style>
+        <title>Wheel of Fortune</title>
+    </head>
+
+
+    <body>
+        <div id="latestPrize">
+            <p id="result">На помазування піде:</p>
+        </div>
+        <div id="wheelOfFortune">
+            <canvas id="wheel" width="400" height="400"></canvas>
+            <div id="spin">Старт</div>
+        </div>
+        <div id="prizeMenu">
+            <h3>Бажаючі</h3>
+            <ul id="prizes">
+            </ul>
+            <div class="add-prize">
+                <input type="text" id="new-prize" placeholder="Новий бажаючий">
+                <button id="add-prize">Додати</button>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const colors = ["#349D9D", "#FF0D05", "#1F235C", "#5CC653", "#A03CB4", "#D9A88C", "#434517", "#552163", "#B43C60", "#0051FF", "#B488D7", "#67FF3D"];
+                const prizeMenu = document.querySelector("#prizes");
+                const elSpin = document.querySelector("#spin");
+                const result = document.querySelector("#result");
+                const latestPrize = document.querySelector("#latestPrize");
+                const ctx = document.querySelector("#wheel").getContext("2d");
+                const dia = ctx.canvas.width;
+                const rad = dia / 2;
+                const PI = Math.PI;
+                const TAU = 2 * PI;
+                let numPrizes = 0;
+                const friction = 0.991;
+                const angVelMin = 0.002;
+                let angVelMax = 0;
+                let angVel = 0;
+                let ang = 0;
+                let isSpinning = false;
+                let isAccelerating = false;
+                let animFrame = null;
+
+                function createPrizeElement(value) {
+                    const li = document.createElement("li");
+                    li.className = "prizeWithRemove";
+
+                    const span = document.createElement("span");
+                    span.className = "prize";
+                    span.textContent = value.toString();
+
+                    const a = document.createElement("a");
+                    a.className = "removePrize";
+                    a.textContent = "×";
+                    a.addEventListener("click", () => removePrize(li));
+
+                    li.appendChild(span);
+                    li.appendChild(a);
+
+                    return li;
+                }
+
+                function removePrize(prizeElement) {
+                    const prizeIndex = Array.from(prizeMenu.querySelectorAll(".prizeWithRemove")).indexOf(prizeElement);
+                    if (prizeIndex !== -1) {
+                        prizeMenu.removeChild(prizeElement);
+                        defaultPrizeValues.splice(prizeIndex, 1);
+                        numPrizes--;
+                        ctx.clearRect(0, 0, dia, dia);
+                        defaultPrizeValues.forEach((value, i) => {
+                            drawSector(colors[i], value, i);
+                        });
+                        rotate();
+                    }
+                }
+
+                function addPrizeToListAndWheel(value) {
+                    const prizeElement = createPrizeElement(value);
+                    prizeMenu.appendChild(prizeElement);
+                    defaultPrizeValues.push(value);
+                    numPrizes++;
+                    ctx.clearRect(0, 0, dia, dia);
+                    defaultPrizeValues.forEach((value, i) => {
+                        drawSector(colors[i], value, i);
+                    });
+                    rotate();
+                }
+
+                function drawSector(color, value, i) {
+                    const ang = TAU / numPrizes;
+                    ctx.save();
+                    //color
+                    const colorIndex = i % colors.length;
+                    ctx.beginPath();
+                    ctx.fillStyle = colors[colorIndex];
+                    ctx.moveTo(rad, rad);
+                    ctx.arc(rad, rad, rad, ang * i, ang * (i + 1));
+                    ctx.lineTo(rad, rad);
+                    ctx.fill();
+                    //text
+                    ctx.translate(rad, rad);
+                    ctx.rotate(ang * (i + 0.5));
+                    ctx.textAlign = "right";
+                    ctx.fillStyle = "#fff";
+                    ctx.font = "bold 30px sans-serif";
+                    ctx.fillText(value.toString(), rad - 10, 10);
+                    ctx.restore();
+                }
+
+                //rotate 
+                function rotate() {
+                    const index = Math.floor(numPrizes - ang / TAU * numPrizes) % numPrizes;
+                    const value = defaultPrizeValues[index];
+                    if (value) {
+                        const color = colors[index];
+                        ctx.canvas.style.transform = `rotate(${ang - PI / 2}rad)`;
+                        elSpin.textContent = !angVel ? "SPIN" : value.toString();
+                        elSpin.style.background = color;
+                        result.textContent = value.toString();
+                        latestPrize.textContent = `Latest prize: ${value}`;
+                    }
+                }
+
+                const frame = () => {
+                    if (!isSpinning) return;
+
+                    if (angVel >= angVelMax) isAccelerating = false;
+
+                    if (isAccelerating) {
+                        angVel ||= angVelMin;
+                        angVel *= 1.06;
+                    } else {
+                        isAccelerating = false;
+                        angVel *= friction; 
+
+                        if (angVel < angVelMin) {
+                            isSpinning = false;
+                            angVel = 0;
+                            cancelAnimationFrame(animFrame);
+                        }
+                    }
+
+                    ang += angVel; 
+                    ang %= TAU; 
+                    rotate();     
+                };
+
+                const engine = () => {
+                    frame();
+                    animFrame = requestAnimationFrame(engine);
+                };
+
+                elSpin.addEventListener("click", () => {
+                    if (isSpinning) return;
+                    isSpinning = true;
+                    isAccelerating = true;
+                    angVelMax = rand(0.25, 0.40);
+                    engine();
+                });
+
+                function rand(m, M) {
+                    return Math.random() * (M - m) + m;
+                }
+
+                const defaultPrizeValues = ['Діма', 'Артем', 'Володя С', 'Володя Ф', 'Денис Ф', 'Юра', 'Максим', 'Денис Л']; // default prize
+                numPrizes = defaultPrizeValues.length;
+
+                const defaultPrizeElements = defaultPrizeValues.map(value => createPrizeElement(value));
+                defaultPrizeElements.forEach(prizeElement => prizeMenu.appendChild(prizeElement));
+
+                defaultPrizeValues.forEach((value, i) => {
+                    drawSector(colors[i], value, i);
+                });
+
+                rotate();
+
+                //add button mouse, keyboard
+                const addPrizeButton = document.querySelector("#add-prize");
+                const newPrizeInput = document.querySelector("#new-prize");
+
+                newPrizeInput.addEventListener("keyup", (event) => {
+                    if (event.key === "Enter") {
+                        const newPrizeValue = newPrizeInput.value.trim();
+
+                        if (newPrizeValue !== "") {
+                            addPrizeToListAndWheel(newPrizeValue);
+                            newPrizeInput.value = "";
+                        }
+                    }
+                });
+
+                addPrizeButton.addEventListener("click", () => {
+                    const newPrizeValue = newPrizeInput.value.trim();
+
+                    if (newPrizeValue !== "") {
+                        addPrizeToListAndWheel(newPrizeValue);
+                        newPrizeInput.value = "";
+                    }
+                });
+
+            });
+        </script>
+    </body>
+</html>
