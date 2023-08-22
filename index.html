@@ -188,7 +188,7 @@
                 }
             }  
         </style>
-        <title>Wheel of Fortune</title>
+        <title>помазування</title>
     </head>
 
 
@@ -305,10 +305,10 @@
                     if (value) {
                         const color = colors[index];
                         ctx.canvas.style.transform = `rotate(${ang - PI / 2}rad)`;
-                        elSpin.textContent = !angVel ? "SPIN" : value.toString();
+                        elSpin.textContent = !angVel ? "Старт" : value.toString();
                         elSpin.style.background = color;
                         result.textContent = value.toString();
-                        latestPrize.textContent = `Latest prize: ${value}`;
+                        latestPrize.textContent = `На помазування піде: ${value}`;
                     }
                 }
 
