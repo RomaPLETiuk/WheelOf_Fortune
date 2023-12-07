@@ -305,10 +305,10 @@
                     if (value) {
                         const color = colors[index];
                         ctx.canvas.style.transform = `rotate(${ang - PI / 2}rad)`;
-                        elSpin.textContent = !angVel ? "Старт" : value.toString();
+                        elSpin.textContent = !angVel ? "Start" : value.toString();
                         elSpin.style.background = color;
                         result.textContent = value.toString();
-                        latestPrize.textContent = `На помазування піде: ${value}`;
+                        latestPrize.textContent = `Wheel of Fortune win: ${value}`;
                     }
                 }
 
