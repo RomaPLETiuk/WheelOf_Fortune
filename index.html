@@ -188,25 +188,25 @@
                 }
             }  
         </style>
-        <title>помазування</title>
+        <title>Wheel of Fortune</title>
     </head>
 
 
     <body>
         <div id="latestPrize">
-            <p id="result">На помазування піде:</p>
+            <p id="result">Wheel of Fortune</p>
         </div>
         <div id="wheelOfFortune">
             <canvas id="wheel" width="400" height="400"></canvas>
-            <div id="spin">Старт</div>
+            <div id="spin">Start</div>
         </div>
         <div id="prizeMenu">
-            <h3>Бажаючі</h3>
+            <h3>Options</h3>
             <ul id="prizes">
             </ul>
             <div class="add-prize">
                 <input type="text" id="new-prize" placeholder="Новий бажаючий">
-                <button id="add-prize">Додати</button>
+                <button id="add-prize">Add Options</button>
             </div>
         </div>
 
@@ -353,7 +353,7 @@
                     return Math.random() * (M - m) + m;
                 }
 
-                const defaultPrizeValues = ['Діма', 'Артем', 'Володя С', 'Володя Ф', 'Денис Ф', 'Юра', 'Максим', 'Денис Л']; // default prize
+                const defaultPrizeValues = ['You', 'I']; // default prize
                 numPrizes = defaultPrizeValues.length;
 
                 const defaultPrizeElements = defaultPrizeValues.map(value => createPrizeElement(value));
